@@ -1,0 +1,55 @@
+✅ ========= бот информирования ===============
+info-alarm.service - служба запуска бота информирования о состоянии фотоловушек
+(запускает  /home/adm_1/foto_catcher/info_8_v2.py)
+info-alarm.timer - таймер
+Модули: 
+	- config.py
+	- tdm_bot.py
+
+
+✅ ======   бот по получению статистики и последней фотки =============
+photo-setup-bot.service - служба запуска бота по получению статистики и последней фотки
+(запускает  /home/adm_1/foto_catcher/foto_setup_v7.5_stat.py)
+Модули:
+  - config_foto_setup.py
+  - stat_v3_beauty.py
+ 
+
+
+✅ ========= сбор почты и записи в БД  ==============
+mail-checker.service - служба запуска сбора почты и записи в БД
+(запускает  /home/adm_1/foto_catcher/mail_pusher_v052_log.py)   - 29мая добавлено логирование
+mail-checker.timer таймер
+
+
+
+=✅======== НЕЙРОСЕТКА обработки фото из БД  ==============
+- photo-analyzer.service -- служба запуска нейросетки 
+(запускает  /home/adm_1/foto_catcher/analyze_photos.py)
+- photo-analyzer.timer -  таймер
+Модули:
+  - config .py
+  - logging_config.py
+  - telegram_bot.py
+  - truck_detector.py
+  - tdm_bot.py
+
+
+
+
+# Запустить сервис
+sudo systemctl daemon-reload
+sudo systemctl stop ____service
+sudo systemctl start ____service
+
+# Включить автозапуск при загрузке
+sudo systemctl enable ____service
+
+# Проверить статус
+sudo systemctl status ____service
+
+
+------------
+
+# Последние 10 строк логов
+sudo journalctl -u ____service -n 100

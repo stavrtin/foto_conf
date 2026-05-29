@@ -1,0 +1,139 @@
+# app_foto_config/views.py
+
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.db.models import Q
+from .models import ConfigTab, OkrugTab
+from .forms import ConfigFilterForm
+from datetime import datetime
+
+
+@login_required
+def main_config(request):
+    """Главная страница с таблицей конфигураций и фильтрацией"""
+    configurations = ConfigTab.objects.select_related('okrug').all()
+    filter_form = ConfigFilterForm(request.GET or None)
+
+    if filter_form.is_valid():
+        imei = filter_form.cleaned_data.get('imei')
+        okrug = filter_form.cleaned_data.get('okrug')
+
+        if imei:
+            configurations = configurations.filter(imei__icontains=imei)
+        if okrug:
+            configurations = configurations.filter(okrug=okrug)
+
+    context = {
+        'configurations': configurations,
+        'filter_form': filter_form,
+    }
+    return render(request, 'main_config.html', context)
+
+
+@login_required
+def add_config(request):
+    """Страница добавления новой конфигурации (без использования форм)"""
+    if request.method == 'POST':
+        # Получаем данные из POST запроса
+        imei = request.POST.get('imei', '').strip()
+        addr_orientir = request.POST.get('addr_orientir', '').strip()
+        lat = request.POST.get('lat', '').strip()
+        long = request.POST.get('long', '').strip()
+        okrug_id = request.POST.get('okrug')
+        status = request.POST.get('status', 'off')
+
+        # Валидация
+        errors = []
+        if not imei:
+            errors.append('Поле IMEI обязательно для заполнения')
+        if ConfigTab.objects.filter(imei=imei).exists():
+            errors.append(f'Фотоловушка с IMEI {imei} уже существует')
+
+        if errors:
+            okrugs = OkrugTab.objects.all()
+            context = {
+                'errors': errors,
+                'okrugs': okrugs,
+                'form_data': request.POST,
+            }
+            return render(request, 'input_config.html', context)
+
+        # Создаем новую запись
+        config = ConfigTab(
+            imei=imei,
+            addr_orientir=addr_orientir,
+            lat=lat,
+            long=long,
+            status=status,
+            autor=request.user.username,  # Берем автора из авторизации
+        )
+
+        if okrug_id:
+            try:
+                config.okrug = OkrugTab.objects.get(id=okrug_id)
+            except OkrugTab.DoesNotExist:
+                pass
+
+        config.save()
+        messages.success(request, f'Конфигурация для фотоловушки {imei} успешно создана')
+        return redirect('main_config')
+
+    else:
+        # GET запрос - показываем форму
+        okrugs = OkrugTab.objects.all()
+        context = {
+            'okrugs': okrugs,
+            'status_choices': ConfigTab.STATUS_CHOICES,
+        }
+        return render(request, 'input_config.html', context)
+
+
+@login_required
+def edit_config(request, pk):
+    """Редактирование существующей конфигурации"""
+    config = get_object_or_404(ConfigTab, pk=pk)
+
+    if request.method == 'POST':
+        # Обновляем данные
+        config.imei = request.POST.get('imei', config.imei).strip()
+        config.addr_orientir = request.POST.get('addr_orientir', config.addr_orientir).strip()
+        config.lat = request.POST.get('lat', config.lat).strip()
+        config.long = request.POST.get('long', config.long).strip()
+        config.status = request.POST.get('status', config.status)
+
+        okrug_id = request.POST.get('okrug')
+        if okrug_id:
+            try:
+                config.okrug = OkrugTab.objects.get(id=okrug_id)
+            except OkrugTab.DoesNotExist:
+                pass
+        else:
+            config.okrug = None
+
+        config.save()
+        messages.success(request, f'Конфигурация для фотоловушки {config.imei} успешно обновлена')
+        return redirect('main_config')
+
+    else:
+        okrugs = OkrugTab.objects.all()
+        context = {
+            'config': config,
+            'okrugs': okrugs,
+            'status_choices': ConfigTab.STATUS_CHOICES,
+            'is_edit': True,
+        }
+        return render(request, 'input_config.html', context)
+
+
+@login_required
+def delete_config(request, pk):
+    """Удаление конфигурации"""
+    config = get_object_or_404(ConfigTab, pk=pk)
+    if request.method == 'POST':
+        imei = config.imei
+        config.delete()
+        messages.success(request, f'Конфигурация для фотоловушки {imei} успешно удалена')
+        return redirect('main_config')
+
+    return render(request, 'confirm_delete.html', {'config': config})

@@ -1,0 +1,65 @@
+﻿# Python
+__pycache__/
+*.py[cod]
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+
+# Virtual Environment
+.venv/
+.venv_foto_conf/
+venv/
+ENV/
+env/
+pythonenv*
+
+# Django
+*.log
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+local_settings.py
+*.pyc
+
+# IDE - PyCharm
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+$RECYCLE.BIN/
+
+# играции Django (исключаем миграции)
+*/migrations/*.py
+!*/migrations/__init__.py
+
+# Logs and temp files
+*.log
+*.tmp
+*.bak
+*.swp
+*.swo
+*~
+
+# Archives
+*.zip
+*.rar
+*.7z
+
+# Secrets
+.env
+.secrets
+*.key
+*.pem
+
+# Files
+clear.zip
+foto_config.zip

@@ -1,0 +1,121 @@
+<!-- app_foto_config/templates/app_foto_config/input_config.html -->
+{% extends 'base.html' %}
+
+{% block title %}{% if is_edit %}Редактирование{% else %}Добавление{% endif %} конфигурации{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">{% if is_edit %}Редактирование{% else %}Добавление{% endif %} конфигурации фотоловушки</h4>
+            </div>
+            <div class="card-body">
+                {% if errors %}
+                    <div class="alert alert-danger">
+                        <h5>Ошибки валидации:</h5>
+                        <ul>
+                            {% for error in errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+
+                <form method="post">
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label for="imei" class="form-label">IMEI <span class="text-danger">*</span></label>
+                        <input type="text"
+                               class="form-control {% if errors %}is-invalid{% endif %}"
+                               id="imei"
+                               name="imei"
+                               value="{% if config %}{{ config.imei }}{% elif form_data %}{{ form_data.imei }}{% endif %}"
+                               {% if is_edit %}readonly{% endif %}
+                               required>
+                        {% if is_edit %}
+                            <div class="form-text text-muted">IMEI нельзя изменить при редактировании</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="addr_orientir" class="form-label">Адресный ориентир</label>
+                        <textarea class="form-control"
+                                  id="addr_orientir"
+                                  name="addr_orientir"
+                                  rows="2">{% if config %}{{ config.addr_orientir }}{% elif form_data %}{{ form_data.addr_orientir }}{% endif %}</textarea>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="lat" class="form-label">Широта</label>
+                            <input type="text"
+                                   class="form-control"
+                                   id="lat"
+                                   name="lat"
+                                   value="{% if config %}{{ config.lat }}{% elif form_data %}{{ form_data.lat }}{% endif %}"
+                                   placeholder="Например: 55.751244">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="long" class="form-label">Долгота</label>
+                            <input type="text"
+                                   class="form-control"
+                                   id="long"
+                                   name="long"
+                                   value="{% if config %}{{ config.long }}{% elif form_data %}{{ form_data.long }}{% endif %}"
+                                   placeholder="Например: 37.618423">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="okrug" class="form-label">Округ</label>
+                        <select class="form-select" id="okrug" name="okrug">
+                            <option value="">-- Выберите округ --</option>
+                            {% for okrug in okrugs %}
+                                <option value="{{ okrug.id }}"
+                                        {% if config and config.okrug and config.okrug.id == okrug.id %}selected{% endif %}>
+                                    {{ okrug.name_okrug }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Статус</label>
+                        <div class="form-check">
+                            <input class="form-check-input"
+                                   type="radio"
+                                   name="status"
+                                   id="status_on"
+                                   value="on"
+                                   {% if config and config.status == 'on' %}checked{% elif not config and not form_data %}checked{% endif %}>
+                            <label class="form-check-label" for="status_on">
+                                Включено
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input"
+                                   type="radio"
+                                   name="status"
+                                   id="status_off"
+                                   value="off"
+                                   {% if config and config.status == 'off' %}checked{% endif %}>
+                            <label class="form-check-label" for="status_off">
+                                Выключено
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="text-end">
+                        <a href="{% url 'main_config' %}" class="btn btn-secondary">Отмена</a>
+                        <button type="submit" class="btn btn-primary">
+                            {% if is_edit %}Сохранить изменения{% else %}Создать конфигурацию{% endif %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
