@@ -1,4 +1,4 @@
-<!-- app_foto_config/templates/app_foto_config/confirm_delete.html -->
+<!-- templates/confirm_delete.html -->
 {% extends 'base.html' %}
 
 {% block title %}Подтверждение удаления{% endblock %}
@@ -8,17 +8,27 @@
     <div class="col-md-6">
         <div class="card">
             <div class="card-header bg-danger text-white">
-                <h4 class="mb-0">Подтверждение удаления</h4>
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-exclamation-triangle fa-2x me-2"></i>
+                    <h4 class="mb-0">Подтверждение удаления</h4>
+                </div>
             </div>
-            <div class="card-body">
-                <p>Вы действительно хотите удалить конфигурацию фотоловушки <strong>{{ config.imei }}</strong>?</p>
-                <p class="text-danger">Это действие необратимо!</p>
+            <div class="card-body text-center p-4">
+                <i class="fas fa-camera fa-4x mb-3" style="color: #dc3545;"></i>
+                <p class="lead">Вы действительно хотите удалить конфигурацию фотоловушки <strong>{{ config.imei }}</strong>?</p>
+                <p class="text-danger">
+                    <i class="fas fa-exclamation-circle"></i> Это действие необратимо!
+                </p>
 
                 <form method="post">
                     {% csrf_token %}
-                    <div class="text-end">
-                        <a href="{% url 'main_config' %}" class="btn btn-secondary">Отмена</a>
-                        <button type="submit" class="btn btn-danger">Удалить</button>
+                    <div class="mt-4">
+                        <a href="{% url 'main_config' %}" class="btn btn-secondary me-2">
+                            <i class="fas fa-times"></i> Отмена
+                        </a>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash"></i> Удалить
+                        </button>
                     </div>
                 </form>
             </div>

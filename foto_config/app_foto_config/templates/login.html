@@ -1,29 +1,68 @@
-<!-- app_foto_config/templates/app_foto_config/login.html -->
+<!-- templates/login.html -->
 {% extends 'base.html' %}
 
-{% block title %}Вход в систему{% endblock %}
+{% block title %}Авторизация - Контроль Экологии Москвы{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-md-4">
+    <div class="col-md-5">
         <div class="card">
-            <div class="card-header bg-primary text-white">
-                <h4 class="mb-0">Вход в систему</h4>
+            <div class="card-header text-center">
+                <i class="fas fa-tree fa-3x mb-2"></i>
+                <h3 class="mb-0">Авторизуйтесь</h3>
+                <p class="mt-2 mb-0" style="font-size: 0.9rem; opacity: 0.9;">
+
+                </p>
             </div>
-            <div class="card-body">
+            <div class="card-body p-4">
+                {% if form.errors %}
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle"></i> Неверное имя пользователя или пароль
+                    </div>
+                {% endif %}
+
                 <form method="post">
                     {% csrf_token %}
-                    <div class="mb-3">
-                        <label for="username" class="form-label">Имя пользователя</label>
-                        <input type="text" name="username" id="username" class="form-control" required>
+                    <div class="mb-4">
+                        <label for="id_username" class="form-label">
+                            <i class="fas fa-envelope eco-icon"></i> Почта
+                        </label>
+                        <input type="text"
+                               name="username"
+                               id="id_username"
+                               class="form-control"
+                               placeholder="Введите адрес почты"
+                               required
+                               autofocus>
                     </div>
-                    <div class="mb-3">
-                        <label for="password" class="form-label">Пароль</label>
-                        <input type="password" name="password" id="password" class="form-control" required>
+                    <div class="mb-4">
+                        <label for="id_password" class="form-label">
+                            <i class="fas fa-lock eco-icon"></i> Пароль
+                        </label>
+                        <input type="password"
+                               name="password"
+                               id="id_password"
+                               class="form-control"
+                               placeholder="Введите пароль"
+                               required>
                     </div>
-                    <button type="submit" class="btn btn-primary w-100">Войти</button>
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-arrow-right"></i> Продолжить
+                    </button>
                 </form>
+
+                <div class="text-center mt-4">
+                    <small class="text-muted">
+                        <i class="fas fa-shield-alt"></i> Безопасная авторизация
+                    </small>
+                </div>
             </div>
+        </div>
+
+        <div class="text-center mt-3">
+            <small class="text-muted">
+                <i class="fas fa-leaf"></i> Система контроля экологической безопасности Москвы
+            </small>
         </div>
     </div>
 </div>

@@ -95,8 +95,33 @@ def edit_config(request, pk):
     config = get_object_or_404(ConfigTab, pk=pk)
 
     if request.method == 'POST':
+        # Получаем новый IMEI из формы
+        new_imei = request.POST.get('imei', '').strip()
+        old_imei = config.imei
+
+        # Валидация IMEI
+        errors = []
+        if not new_imei:
+            errors.append('Поле IMEI обязательно для заполнения')
+
+        # Проверяем, не занят ли новый IMEI другой записью
+        if new_imei and new_imei != old_imei:
+            if ConfigTab.objects.filter(imei=new_imei).exists():
+                errors.append(f'Фотоловушка с IMEI {new_imei} уже существует')
+
+        if errors:
+            okrugs = OkrugTab.objects.all()
+            context = {
+                'config': config,
+                'okrugs': okrugs,
+                'status_choices': ConfigTab.STATUS_CHOICES,
+                'is_edit': True,
+                'errors': errors,
+            }
+            return render(request, 'input_config.html', context)
+
         # Обновляем данные
-        config.imei = request.POST.get('imei', config.imei).strip()
+        config.imei = new_imei
         config.addr_orientir = request.POST.get('addr_orientir', config.addr_orientir).strip()
         config.lat = request.POST.get('lat', config.lat).strip()
         config.long = request.POST.get('long', config.long).strip()

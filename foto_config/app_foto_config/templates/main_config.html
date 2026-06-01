@@ -1,45 +1,69 @@
-<!-- app_foto_config/templates/app_foto_config/main_config.html -->
+<!-- templates/main_config.html -->
 {% extends 'base.html' %}
 
-{% block title %}Главная - Управление фотоловушками{% endblock %}
+{% block title %}Главная - Контроль экологии Москвы{% endblock %}
 
 {% block content %}
+maine_conf
 <div class="card">
-    <div class="card-header bg-primary text-white">
-        <h3 class="mb-0">Управление фотоловушками</h3>
+    <div class="card-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <i class="fas fa-camera fa-2x me-2"></i>
+                <h3 class="d-inline-block mb-0">Управление фотоловушками</h3>
+            </div>
+            <div>
+                <span class="badge bg-success">
+                    <i class="fas fa-chart-line"></i> Активно: {{ configurations|length }}
+                </span>
+            </div>
+        </div>
     </div>
     <div class="card-body">
         <!-- Фильтрация -->
-        <form method="get" class="row g-3 mb-4">
-            {{ filter_form.non_field_errors }}
-            <div class="col-md-4">
-                {{ filter_form.imei.label_tag }}
-                {{ filter_form.imei }}
-            </div>
-            <div class="col-md-4">
-                {{ filter_form.okrug.label_tag }}
-                {{ filter_form.okrug }}
-            </div>
-            <div class="col-md-4 d-flex align-items-end">
-                <button type="submit" class="btn btn-primary me-2">Фильтровать</button>
-                <a href="{% url 'main_config' %}" class="btn btn-secondary">Сбросить</a>
-            </div>
-        </form>
+        <div class="filter-section">
+            <h5 class="mb-3">
+                <i class="fas fa-filter eco-icon"></i> Фильтрация данных
+            </h5>
+            <form method="get" class="row g-3">
+                {{ filter_form.non_field_errors }}
+                <div class="col-md-5">
+                    <label for="id_imei" class="form-label">
+                        <i class="fas fa-qrcode"></i> {{ filter_form.imei.label }}
+                    </label>
+                    {{ filter_form.imei }}
+                </div>
+                <div class="col-md-5">
+                    <label for="id_okrug" class="form-label">
+                        <i class="fas fa-map-marker-alt"></i> {{ filter_form.okrug.label }}
+                    </label>
+                    {{ filter_form.okrug }}
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100 me-2">
+                        <i class="fas fa-search"></i> Поиск
+                    </button>
+                    <a href="{% url 'main_config' %}" class="btn btn-secondary w-100">
+                        <i class="fas fa-sync-alt"></i> Сброс
+                    </a>
+                </div>
+            </form>
+        </div>
 
         <!-- Таблица конфигураций -->
         <div class="table-responsive">
-            <table class="table table-striped table-hover">
-                <thead class="table-dark">
+            <table class="table table-hover">
+                <thead>
                     <tr>
-                        <th>IMEI</th>
-                        <th>Адресный ориентир</th>
-                        <th>Широта</th>
-                        <th>Долгота</th>
-                        <th>Округ</th>
-                        <th>Автор</th>
-                        <th>Дата записи</th>
-                        <th>Статус</th>
-                        <th>Действия</th>
+                        <th><i class="fas fa-qrcode"></i> IMEI</th>
+                        <th><i class="fas fa-location-dot"></i> Адресный ориентир</th>
+                        <th><i class="fas fa-arrow-up"></i> Широта</th>
+                        <th><i class="fas fa-arrow-left"></i> Долгота</th>
+                        <th><i class="fas fa-map"></i> Округ</th>
+                        <th><i class="fas fa-user"></i> Автор</th>
+                        <th><i class="fas fa-calendar"></i> Дата записи</th>
+                        <th><i class="fas fa-toggle-on"></i> Статус</th>
+                        <th><i class="fas fa-cogs"></i> Действия</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -54,19 +78,30 @@
                         <td>{{ config.date_records|date:"d.m.Y H:i" }}</td>
                         <td>
                             {% if config.status == 'on' %}
-                                <span class="badge bg-success">Включено</span>
+                                <span class="badge bg-success">
+                                    <i class="fas fa-play"></i> Включено
+                                </span>
                             {% else %}
-                                <span class="badge bg-danger">Выключено</span>
+                                <span class="badge bg-secondary">
+                                    <i class="fas fa-stop"></i> Выключено
+                                </span>
                             {% endif %}
                         </td>
                         <td>
-                            <a href="{% url 'edit_config' config.id %}" class="btn btn-sm btn-warning">Редактировать</a>
-                            <a href="{% url 'delete_config' config.id %}" class="btn btn-sm btn-danger">Удалить</a>
+                            <a href="{% url 'edit_config' config.id %}" class="btn btn-sm btn-warning me-1">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="{% url 'delete_config' config.id %}" class="btn btn-sm btn-danger">
+                                <i class="fas fa-trash"></i>
+                            </a>
                         </td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="9" class="text-center">Нет данных о фотоловушках</td>
+                        <td colspan="9" class="text-center">
+                            <i class="fas fa-camera-slash fa-3x mb-3 d-block"></i>
+                            Нет данных о фотоловушках
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -74,7 +109,9 @@
         </div>
 
         <div class="text-end mt-3">
-            <a href="{% url 'add_config' %}" class="btn btn-success">Добавить новую конфигурацию</a>
+            <a href="{% url 'add_config' %}" class="btn btn-success">
+                <i class="fas fa-plus-circle"></i> Добавить новую конфигурацию
+            </a>
         </div>
     </div>
 </div>
