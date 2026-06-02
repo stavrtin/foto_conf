@@ -3,6 +3,28 @@
 
 {% block title %}{% if is_edit %}Редактирование{% else %}Добавление{% endif %} конфигурации{% endblock %}
 
+{% block extra_css %}
+<style>
+    .field-hint {
+        font-size: 0.8rem;
+        color: #6c757d;
+        margin-top: 5px;
+    }
+    .field-hint i {
+        margin-right: 3px;
+    }
+    .errorlist {
+        color: #dc3545;
+        list-style: none;
+        padding-left: 0;
+        margin-top: 5px;
+    }
+    .errorlist li {
+        font-size: 0.85rem;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-md-8">
@@ -39,13 +61,13 @@
                                id="imei"
                                name="imei"
                                value="{% if config %}{{ config.imei }}{% elif form_data %}{{ form_data.imei }}{% endif %}"
-                               required
-                               placeholder="Введите IMEI фотоловушки">
-                        {% if is_edit %}
-                            <small class="text-muted">
-                                <i class="fas fa-info-circle"></i> Внимание: изменение IMEI может повлиять на связанные данные
-                            </small>
-                        {% endif %}
+                               placeholder="Введите 15 цифр"
+                               maxlength="15"
+                               pattern="\d{15}"
+                               required>
+                        <div class="field-hint">
+                            <i class="fas fa-info-circle"></i> Формат: 15 цифр без пробелов и других символов
+                        </div>
                     </div>
 
                     <div class="mb-3">
@@ -69,7 +91,11 @@
                                    id="lat"
                                    name="lat"
                                    value="{% if config %}{{ config.lat }}{% elif form_data %}{{ form_data.lat }}{% endif %}"
-                                   placeholder="Например: 55.751244">
+                                   placeholder="Например: 55.751244"
+                                   step="any">
+                            <div class="field-hint">
+                                <i class="fas fa-info-circle"></i> Формат: градусы.до 6 знаков (например: 55.751244)
+                            </div>
                         </div>
                         <div class="col-md-6">
                             <label for="long" class="form-label">
@@ -80,7 +106,11 @@
                                    id="long"
                                    name="long"
                                    value="{% if config %}{{ config.long }}{% elif form_data %}{{ form_data.long }}{% endif %}"
-                                   placeholder="Например: 37.618423">
+                                   placeholder="Например: 37.618423"
+                                   step="any">
+                            <div class="field-hint">
+                                <i class="fas fa-info-circle"></i> Формат: градусы.до 6 знаков (например: 37.618423)
+                            </div>
                         </div>
                     </div>
 
@@ -141,4 +171,39 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Дополнительная клиентская валидация для IMEI
+    document.getElementById('imei').addEventListener('input', function(e) {
+        this.value = this.value.replace(/[^0-9]/g, '').slice(0, 15);
+    });
+
+    // Валидация координат в реальном времени
+    function validateCoordinateInput(input) {
+        let value = input.value;
+        // Разрешаем только цифры, минус и точку
+        value = value.replace(/[^0-9.-]/g, '');
+        // Ограничиваем количество знаков после точки
+        if (value.includes('.')) {
+            let parts = value.split('.');
+            if (parts[1] && parts[1].length > 6) {
+                parts[1] = parts[1].slice(0, 6);
+                value = parts.join('.');
+            }
+        }
+        input.value = value;
+    }
+
+    const latInput = document.getElementById('lat');
+    const longInput = document.getElementById('long');
+
+    if (latInput) {
+        latInput.addEventListener('input', function() { validateCoordinateInput(this); });
+    }
+    if (longInput) {
+        longInput.addEventListener('input', function() { validateCoordinateInput(this); });
+    }
+</script>
 {% endblock %}
